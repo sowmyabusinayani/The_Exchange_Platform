@@ -5,7 +5,7 @@ class Flower:
         self.initial_Stock = initial_Stock
         self.committed_stock = 0
 
-    def update_Initial_Stock(self, quantity):
+    def update_stock(self, quantity):
         self.initial_Stock = self.initial_Stock - quantity
 
     def to_dict(self):

@@ -11,7 +11,7 @@ class Order:
         self.status = "Pending"
 
     def place_order(self):
-        if self.flower.stock >= self.quantity:
+        if self.flower.initial_Stock >= self.quantity:
             self.flower.update_stock(self.quantity)
             self.status = "Confirmed"
             print("The order placed by the customer has been ", self.status)
@@ -28,7 +28,7 @@ class Order:
             "flower": {
                 "name": self.flower.name,
                 "price": self.flower.price,
-                "stock": self.flower.stock
+                "stock": self.flower.initial_Stock
             },
             "quantity": self.quantity,
             "status": self.status
