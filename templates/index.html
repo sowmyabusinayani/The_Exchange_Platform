@@ -1,220 +1,495 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Otani Flower Orders</title>
-        <style>
-             body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>The Exchange Platform</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        /* --- RESET & BASICS --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        h1, h2 {
-            margin-bottom: 10px;
+
+        html {
+            scroll-behavior: smooth;
         }
-        .section {
-            border: 1px solid #ddd;
-            padding: 15px;
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            overflow-x: hidden;
+            background-color: #f9f9f9;
+        }
+
+        /* --- 1. TOP ANNOUNCEMENT BAR --- */
+        .announcement-bar {
+            height: 40px;
+            background-color: #2d6a4f;
+            color: #d8f3dc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            position: relative;
+        }
+
+        /* --- 2. HERO NAVIGATION BAR --- */
+        .nav-bar {
+            height: 160px;
+            width: 100%;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #d8f3dc;
+        }
+
+        /* --- SECTIONS COMMON STYLE --- */
+        section {
+            min-height: 100vh;
+            padding-top: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- SECTION 1: HOME --- */
+        #home {
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+                url('https://plus.unsplash.com/premium_photo-1674986180946-a2984bd93c2c?q=80&w=1170&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            justify-content: center;
+            padding-top: 0;
+            color: white;
+            text-align: center;
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px 50px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin-top: 100px;
+        }
+
+        .search-container h2 {
+            color: #2d6a4f;
             margin-bottom: 20px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 15px 25px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            width: 250px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-box button {
+            padding: 15px 30px;
+            background-color: #2d6a4f;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-box button:hover {
+            background-color: #1b4332;
+        }
+
+        /* --- SECTION 2: SHOP --- */
+        #shop {
+            background-color: #fff;
+            padding: 100px 20px;
+        }
+
+        #shop h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #2d6a4f;
+        }
+
+        .flower-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .flower-card {
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .flower-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .flower-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .flower-info {
+            margin-top: 15px;
+        }
+
+        .flower-name {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .flower-price {
+            color: #2d6a4f;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-top: 5px;
+        }
+
+        .add-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #fff;
+            border: 1px solid #2d6a4f;
+            color: #2d6a4f;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            background-color: #2d6a4f;
+            color: #fff;
+        }
+
+        /* --- SECTION 3: CART --- */
+        #cart {
+            background-color: #fff;
+            padding: 100px 20px;
+            min-height: 60vh;
+        }
+
+        #cart h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #2d6a4f;
+        }
+
+        .cart-table {
+            width: 100%;
+            max-width: 1000px;
+            border-collapse: collapse;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .cart-table th {
+            background-color: #2d6a4f;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .cart-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .cart-product {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cart-product img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
             border-radius: 6px;
         }
-        label {
-            display: block;
-            margin-top: 8px;
+
+        .cart-product span {
+            font-weight: 600;
+            font-size: 16px;
         }
-        select, input {
-            padding: 6px;
-            margin-top: 4px;
-            width: 200px;
+
+        .qty-select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 80px;
         }
-        button {
-            margin-top: 12px;
-            padding: 8px 16px;
-            cursor: pointer;
-        }
-        #message {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        table {
-            border-collapse: collapse;
+
+        .cart-footer {
+            max-width: 1000px;
             width: 100%;
-            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
         }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 6px;
-            text-align: left;
-            font-size: 14px;
+
+        .checkout-btn {
+            padding: 15px 40px;
+            background-color: #2d6a4f;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(45, 106, 79, 0.3);
+            transition: transform 0.2s;
         }
-        </style>
-    </head>
-    <body>
-         <h1>Otani Flower Order Demo</h1>
 
-         <div class="section">
-        <h2>Create Order</h2>
+        .checkout-btn:hover {
+            transform: scale(1.02);
+            background-color: #1b4332;
+        }
+    </style>
+</head>
 
-        <label for="customerSelect">Customer</label>
-        <select id="customerSelect"></select>
+<body>
 
-        <label for="flowerSelect">Flower</label>
-        <select id="flowerSelect"></select>
+    <div class="announcement-bar">Shop and sell your blossoms in 'The Exchange Platform' 🌸</div>
 
-        <label for="quantityInput">Quantity</label>
-        <input type="number" id="quantityInput" min="1" value="1" />
+    <nav class="nav-bar">
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#shop">Shop</a>
+            <a href="#cart">Order Now</a>
+        </div>
+    </nav>
 
-        <button id="placeOrderBtn">Place Order</button>
+    <section id="home">
+        <div class="search-container">
+            <h2>Find blossoms near you</h2>
+            <div class="search-box">
+                <input type="text" placeholder="Enter Postal Code (e.g. 500081)">
+                <button>Check Availability</button>
+            </div>
+        </div>
+    </section>
 
-        <div id="message"></div>
-    </div>
-     <div class="section">
-        <h2>Existing Orders</h2>
-        <button id="refreshOrdersBtn">Refresh Orders</button>
-        <div id="ordersContainer"></div>
-    </div>
+    <section id="shop">
+        <h2>Our Fresh Collection</h2>
+        <div class="flower-grid" id="flowerGrid">
+            <p style="text-align:center; width:100%;">Loading flowers...</p>
+        </div>
+    </section>
+
+    <section id="cart">
+        <h2>Your Cart</h2>
+        <table class="cart-table" id="cartTable">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+        <div class="cart-footer">
+            <button class="checkout-btn" id="checkoutBtn">Check Out</button>
+        </div>
+    </section>
 
     <script>
+        // --- 1. SETUP STATE ---
+        let flowers = [];
+        let cart = [];
+
+        // --- 2. ON LOAD ---
         document.addEventListener("DOMContentLoaded", () => {
-            loadCustomers();
-            loadFlowers();
-            loadOrders();
-
-             document.getElementById("placeOrderBtn")
-                .addEventListener("click", placeOrder);
-
-            document.getElementById("refreshOrdersBtn")
-                .addEventListener("click", loadOrders);
+            fetchFlowers(); // Calls Python Backend
+            document.getElementById("checkoutBtn").addEventListener("click", processCheckout);
         });
 
-         // --- Fetch & populate customers ---
-        async function loadCustomers() {
+        // --- 3. FETCH DATA FROM PYTHON BACKEND ---
+        async function fetchFlowers() {
             try {
-                const res = await fetch("/customers");
-                const data = await res.json();
-
-                const select = document.getElementById("customerSelect");
-                select.innerHTML = ""; // clear old
-
-                data.forEach(customer => {
-                    const option = document.createElement("option");
-                    option.value = customer.customer_id;
-                    option.textContent = `${customer.customer_id} - ${customer.name}`;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                console.error("Error loading customers:", error);
-            }
-        }
-
-        
-        // --- Fetch & populate flowers ---
-        async function loadFlowers() {
-            try {
+                // INTEGRATION: Calling the Flask Endpoint
                 const res = await fetch("/flowers");
-                const data = await res.json();
 
-                const select = document.getElementById("flowerSelect");
-                select.innerHTML = "";
+                if (!res.ok) throw new Error("Failed to fetch flowers");
 
-                data.forEach(flower => {
-                    const option = document.createElement("option");
-                    option.value = flower.name;
-                    option.textContent = `${flower.name} (₹${flower.price}, stock: ${flower.stock})`;
-                    select.appendChild(option);
-                });
+                // Parse JSON from Python
+                flowers = await res.json();
+
+                renderShop();
             } catch (error) {
-                console.error("Error loading flowers:", error);
+                console.error("Error fetching flowers:", error);
+                document.getElementById('flowerGrid').innerHTML = "<p>Error loading shop. Is the Python backend running?</p>";
             }
         }
 
-         // --- Place an order using POST /orders ---
-        async function placeOrder() {
-            const customerSelect = document.getElementById("customerSelect");
-            const flowerSelect = document.getElementById("flowerSelect");
-            const quantityInput = document.getElementById("quantityInput");
-            const messageDiv = document.getElementById("message");
+        // --- 4. RENDER SHOP UI ---
+        function renderShop() {
+            const container = document.getElementById('flowerGrid');
+            container.innerHTML = "";
+            flowers.forEach(flower => {
+                const card = document.createElement('div');
+                card.className = 'flower-card';
+                // Using keys from flower.to_dict() in Python (id, img, name, price)
+                card.innerHTML = `
+                    <img src="${flower.img}" alt="${flower.name}">
+                    <div class="flower-info">
+                        <div class="flower-name">${flower.name}</div>
+                        <div class="flower-price">₹${flower.price}</div>
+                        ${flower.stock > 0
+                        ? `<button class="add-btn" onclick="addToCart(${flower.id})">Add to Cart</button>`
+                        : `<button class="add-btn" disabled style="border-color:#ccc; color:#ccc;">Out of Stock</button>`
+                    }
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
 
-            const customer_id = parseInt(customerSelect.value);
-            const flower_name = flowerSelect.value;
-            const quantity = parseInt(quantityInput.value);
+        // --- 5. CART LOGIC ---
+        function addToCart(id) {
+            const flower = flowers.find(f => f.id === id);
+            const existingItem = cart.find(item => item.id === id);
 
-            const payload = { customer_id, flower_name, quantity };
+            if (existingItem) {
+                alert("Item already in cart! You can adjust quantity below.");
+            } else {
+                cart.push({ ...flower, qty: 1 });
+                renderCart();
+                document.getElementById('cart').scrollIntoView();
+            }
+        }
+
+        function renderCart() {
+            const tbody = document.querySelector("#cartTable tbody");
+            tbody.innerHTML = "";
+
+            if (cart.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Your cart is empty.</td></tr>";
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="cart-product"><img src="${item.img}"><span>${item.name}</span></td>
+                    <td>₹${item.price}</td>
+                    <td>
+                        <select class="qty-select" onchange="updateQty(${index}, this.value)">
+                            ${generateOptions(item.stock, item.qty)}
+                        </select>
+                    </td>
+                    <td style="font-weight:bold;">₹${item.price * item.qty}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function generateOptions(stock, currentQty) {
+            let options = "";
+            // Limit dropdown to max 10 or actual stock, whichever is lower
+            const limit = Math.min(stock, 10);
+            for (let i = 1; i <= limit; i++) {
+                options += `<option value="${i}" ${i === currentQty ? "selected" : ""}>${i}</option>`;
+            }
+            return options;
+        }
+
+        function updateQty(index, val) {
+            cart[index].qty = parseInt(val);
+            renderCart();
+        }
+
+        // --- 6. CHECKOUT LOGIC (CONNECTED TO PYTHON) ---
+        async function processCheckout() {
+            if (cart.length === 0) { alert("Cart is empty!"); return; }
+
+            // Prepare payload for Flask: list of { flower_id, quantity }
+            const payload = cart.map(item => ({
+                flower_id: item.id,
+                quantity: item.qty
+            }));
 
             try {
+                // INTEGRATION: Sending data to Flask
                 const res = await fetch("/orders", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload)
                 });
 
                 const data = await res.json();
 
-                if (!res.ok) {
-                    messageDiv.textContent = `Error: ${data.error || "Failed to place order"}`;
-                    messageDiv.style.color = "red";
+                if (res.ok) {
+                    alert(`✅ Order Success!\n\n${data.message}`);
+                    cart = []; // Clear cart
+                    renderCart();
+                    fetchFlowers(); // Refresh shop to show reduced stock!
                 } else {
-                    messageDiv.textContent = `Order #${data.order_id} - Status: ${data.status}`;
-                    messageDiv.style.color = "green";
-                    // Refresh flowers & orders to reflect latest stock and new order
-                    await loadFlowers();
-                    await loadOrders();
+                    alert(`❌ Order Failed: ${data.error || "Unknown error"}`);
                 }
             } catch (error) {
-                console.error("Error placing order:", error);
-                messageDiv.textContent = "Error: Unable to reach server";
-                messageDiv.style.color = "red";
-            }
-        }
-        // --- Load all orders and display in a table ---
-        async function loadOrders() {
-            try {
-                const res = await fetch("/orders");
-                const data = await res.json();
-
-                const container = document.getElementById("ordersContainer");
-                container.innerHTML = "";
-
-                if (data.length === 0) {
-                    container.textContent = "No orders yet.";
-                    return;
-                }
-
-                const table = document.createElement("table");
-
-                const thead = document.createElement("thead");
-                thead.innerHTML = `
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Flower</th>
-                        <th>Quantity</th>
-                        <th>Status</th>
-                    </tr>
-                `;
-                table.appendChild(thead);
-
-                const tbody = document.createElement("tbody");
-
-                data.forEach(order => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `
-                        <td>${order.order_id}</td>
-                        <td>${order.customer.name}</td>
-                        <td>${order.flower.name}</td>
-                        <td>${order.quantity}</td>
-                        <td>${order.status}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                table.appendChild(tbody);
-                container.appendChild(table);
-            } catch (error) {
-                console.error("Error loading orders:", error);
+                console.error("Checkout Error:", error);
+                alert("Server error during checkout.");
             }
         }
     </script>
-    </body>
+</body>
+
 </html>

@@ -1,5 +1,6 @@
 from models.flower import Flower
 from models.customer import Customer
+from datetime import datetime
 
 
 class Order:
@@ -8,17 +9,26 @@ class Order:
         self.customer = customer
         self.flower = flower
         self.quantity = quantity
+        self.total_price = self.flower.price * quantity
         self.status = "Pending"
+        self.timestamp = datetime.now()
 
     def place_order(self):
-        if self.flower.initial_Stock >= self.quantity:
-            self.flower.update_stock(self.quantity)
+        """
+        Attempts to finalize the order.
+        1. Asks the Flower model to move stock from 'Available' to 'Committed'.
+        2. Updates the order status based on the result.
+        """
+        stock_reserved = self.flower.update_stock(self.quantity)
+        if stock_reserved:
             self.status = "Confirmed"
-            print("The order placed by the customer has been ", self.status)
+            return True, "Order confirmed. Stock committed for shipment."
         else:
-            self.status = "Out of Stock"
+            self.status = "Failed"
+            return False, f"Insufficient stock for {self.flower.name}"
 
     def to_dict(self):
+        # Returns order details for the Admin Dashboard or History.
         return {
             "order_id": self.order_id,
             "customer": {
@@ -28,10 +38,11 @@ class Order:
             "flower": {
                 "name": self.flower.name,
                 "price": self.flower.price,
-                "stock": self.flower.initial_Stock
+                "available_stock": self.flower.available_stock
             },
             "quantity": self.quantity,
-            "status": self.status
+            "status": self.status,
+            "date": self.timestamp.strftime("%Y-%m-%d %H:%M")
         }
 
     def __repr__(self) -> str:

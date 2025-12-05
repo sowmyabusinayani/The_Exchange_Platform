@@ -5,17 +5,25 @@ from models.order import Order
 
 app = Flask(__name__)
 
-flowers = {
-    "Orchid": Flower("Orchid", 20, 100),
-    "Tulip": Flower("Tulip", 30, 100)
-}
+# Mock data
+flowers = [
+    Flower(1, "Pink Tulips", 450, 10,
+           "https://images.unsplash.com/photo-1561181226-e8a7edd504c6?q=80&w=687&auto=format&fit=crop"),
+    Flower(2, "White Rice Flower Bouquet", 320, 5,
+           "https://plus.unsplash.com/premium_photo-1668790459193-95f86452a5dc?q=80&w=735&auto=format&fit=crop"),
+    Flower(3, "Royal Red Rose", 500, 8,
+           "https://plus.unsplash.com/premium_photo-1669997827506-e8e7aa33e7e3?q=80&w=687&auto=format&fit=crop"),
+    Flower(4, "Sunflower Bundle", 280, 15,
+           "https://plus.unsplash.com/premium_photo-1676068244464-59294c6ff008?q=80&w=1170&auto=format&fit=crop")
+]
 
-customers = {
-    9: Customer(9, "arya"),
-    8: Customer(8, "puja")
-}
+customers = [
+    Customer(101, "Otani Trading HQ", "admin@otanitrading.com"),
+    Customer(102, "Dubai Floral Shop", "buyer@dubaifloral.com"),
+    Customer(103, "Events UAE", "manager@eventsuae.ae")
+]
 
-orders = {}
+orders = []  # Simple list to store Order objects in memory
 next_order_id = 1
 
 
@@ -27,55 +35,66 @@ def home():
 
 @app.route("/flowers", methods=['GET'])
 def get_flowers():
-    data = [flower.to_dict() for flower in flowers.values()]
+    # Returns list of flowers with Image URL and Stock Status
+    data = [fwr.to_dict() for fwr in flowers]
     return jsonify(data), 200
 
 
 @app.route("/customers", methods=['GET'])
 def get_customers():
-    data = [customer.to_dict() for customer in customers.values()]
+    data = [cust.to_dict() for cust in customers.values()]
     return jsonify(data), 200
+
+
+@app.route('/orders', methods=['GET'])
+def get_orders():
+    # Returns order history for the Admin Dashboard
+    data = [ord.to_dict() for ord in orders]
+    return jsonify(data)
 
 
 @app.route("/orders", methods=['POST'])
 def create_order():
-    global next_order_id
-    body = request.get_json()
+    data = request.json
+    # Validation: Ensure data is a list
+    if not isinstance(data, list):
+        return jsonify({"error": "Invalid format. Expected a list of items."}), 400
 
-    # checking whether body is empty or not to avoid internal server error
-    if not body:
-        return jsonify({"error:Invalid JSON body"}, 400)
+    results = []
+    # Default customer
+    current_customer = customers[1]
+    for item in data:
+        f_id = item.get('flower_id')
+        qty = item.get('quantity')
+        # 1. Find the flower object
+        flower = next((f for f in flowers if f.flower_id == f_id), None)
 
-    # Extracts required values from incoming JSON
-    customer_id = body.get("customer_id")
-    flower_name = body.get("flower_name")
-    quantity = body.get("quantity")
+        if not flower:
+            results.append({"id": f_id, "status": "Failed",
+                           "reason": "Flower not found"})
+            continue
 
-    if customer_id not in customers:
-        return jsonify({"error: customer not found"}, 404)
+        # 2. Create the Order Object
+        new_order_id = len(orders) + 1
+        order = Order(new_order_id, current_customer, flower, qty)
 
-    if flower_name not in flowers:
-        return jsonify({"error: flower not found"}, 404)
+        # 3. Process the Order (Check Stock -> Commit Stock)
+        success, message = order.place_order()  # Using the renamed method
 
-    if not isinstance(quantity, int) or quantity <= 0:
-        return jsonify({"error: Quantity must be positive integer"}, 400)
-
-    customer = customers[customer_id]
-    flower = flowers[flower_name]
-
-    # Creates Order object
-    order = Order(next_order_id, customer, flower, quantity)
-
-    # Applies business logic: validate stock, update stock, set status
-    order.place_order()
-
-    # Saves the new order in our "database"
-    orders[next_order_id] = order
-
-    next_order_id += 1
-
-    # Returns newly created order in JSON
-    return jsonify(order.to_dict()), 201
+        if success:
+            orders.append(order)
+            results.append({
+                "flower": flower.name,
+                "status": "Confirmed",
+                "total_price": order.total_price
+            })
+        else:
+            results.append({
+                "flower": flower.name,
+                "status": "Failed",
+                "reason": message
+            })
+    return jsonify({"message": "Batch processed", "results": results})
 
 
  # Runs the Flask server only when this file is executed directly
