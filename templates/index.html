@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Otani Flower Orders</title>
+        <style>
+             body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        h1, h2 {
+            margin-bottom: 10px;
+        }
+        .section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        label {
+            display: block;
+            margin-top: 8px;
+        }
+        select, input {
+            padding: 6px;
+            margin-top: 4px;
+            width: 200px;
+        }
+        button {
+            margin-top: 12px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: left;
+            font-size: 14px;
+        }
+        </style>
+    </head>
+    <body>
+         <h1>Otani Flower Order Demo</h1>
+
+         <div class="section">
+        <h2>Create Order</h2>
+
+        <label for="customerSelect">Customer</label>
+        <select id="customerSelect"></select>
+
+        <label for="flowerSelect">Flower</label>
+        <select id="flowerSelect"></select>
+
+        <label for="quantityInput">Quantity</label>
+        <input type="number" id="quantityInput" min="1" value="1" />
+
+        <button id="placeOrderBtn">Place Order</button>
+
+        <div id="message"></div>
+    </div>
+     <div class="section">
+        <h2>Existing Orders</h2>
+        <button id="refreshOrdersBtn">Refresh Orders</button>
+        <div id="ordersContainer"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCustomers();
+            loadFlowers();
+            loadOrders();
+
+             document.getElementById("placeOrderBtn")
+                .addEventListener("click", placeOrder);
+
+            document.getElementById("refreshOrdersBtn")
+                .addEventListener("click", loadOrders);
+        });
+
+         // --- Fetch & populate customers ---
+        async function loadCustomers() {
+            try {
+                const res = await fetch("/customers");
+                const data = await res.json();
+
+                const select = document.getElementById("customerSelect");
+                select.innerHTML = ""; // clear old
+
+                data.forEach(customer => {
+                    const option = document.createElement("option");
+                    option.value = customer.customer_id;
+                    option.textContent = `${customer.customer_id} - ${customer.name}`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading customers:", error);
+            }
+        }
+
+        
+        // --- Fetch & populate flowers ---
+        async function loadFlowers() {
+            try {
+                const res = await fetch("/flowers");
+                const data = await res.json();
+
+                const select = document.getElementById("flowerSelect");
+                select.innerHTML = "";
+
+                data.forEach(flower => {
+                    const option = document.createElement("option");
+                    option.value = flower.name;
+                    option.textContent = `${flower.name} (₹${flower.price}, stock: ${flower.stock})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading flowers:", error);
+            }
+        }
+
+         // --- Place an order using POST /orders ---
+        async function placeOrder() {
+            const customerSelect = document.getElementById("customerSelect");
+            const flowerSelect = document.getElementById("flowerSelect");
+            const quantityInput = document.getElementById("quantityInput");
+            const messageDiv = document.getElementById("message");
+
+            const customer_id = parseInt(customerSelect.value);
+            const flower_name = flowerSelect.value;
+            const quantity = parseInt(quantityInput.value);
+
+            const payload = { customer_id, flower_name, quantity };
+
+            try {
+                const res = await fetch("/orders", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    messageDiv.textContent = `Error: ${data.error || "Failed to place order"}`;
+                    messageDiv.style.color = "red";
+                } else {
+                    messageDiv.textContent = `Order #${data.order_id} - Status: ${data.status}`;
+                    messageDiv.style.color = "green";
+                    // Refresh flowers & orders to reflect latest stock and new order
+                    await loadFlowers();
+                    await loadOrders();
+                }
+            } catch (error) {
+                console.error("Error placing order:", error);
+                messageDiv.textContent = "Error: Unable to reach server";
+                messageDiv.style.color = "red";
+            }
+        }
+        // --- Load all orders and display in a table ---
+        async function loadOrders() {
+            try {
+                const res = await fetch("/orders");
+                const data = await res.json();
+
+                const container = document.getElementById("ordersContainer");
+                container.innerHTML = "";
+
+                if (data.length === 0) {
+                    container.textContent = "No orders yet.";
+                    return;
+                }
+
+                const table = document.createElement("table");
+
+                const thead = document.createElement("thead");
+                thead.innerHTML = `
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Flower</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+
+                const tbody = document.createElement("tbody");
+
+                data.forEach(order => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${order.order_id}</td>
+                        <td>${order.customer.name}</td>
+                        <td>${order.flower.name}</td>
+                        <td>${order.quantity}</td>
+                        <td>${order.status}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                table.appendChild(tbody);
+                container.appendChild(table);
+            } catch (error) {
+                console.error("Error loading orders:", error);
+            }
+        }
+    </script>
+    </body>
+</html>
