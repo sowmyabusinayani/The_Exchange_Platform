@@ -1,4 +1,4 @@
-# 🌐 The Exchange Platform
+# 🌐 The Exchange Platform - Enhanced Version (V2.1.0)
 
 A full-stack B2B order management system designed to handle complex inventory logistics and multi-stage trade flows. This project demonstrates a decoupled Frontend/Backend architecture, robust stock validation logic, and a reactive user interface.
 
@@ -14,6 +14,49 @@ It is designed to handle **Triangular Trade** scenarios where inventory must be 
 This distinction allows logistics teams to accurately plan shipments without overselling or losing track of reserved goods.
 
 ---
+
+## What’s New in V2.1.0
+
+### 1. **My Orders List**
+Users can now:
+- View all previously placed orders
+- See order IDs, products, quantities, and status
+- Quickly navigate to full order details
+
+### 2. **Order Details View**
+Each order now includes:
+- Customer info  
+- Flower details  
+- Order date  
+- Status  
+- Tracking link  
+- Auto-generated tracking code  
+
+### 3. **Shareable Short Tracking Link**
+A brand-new microservice-style module:
+
+`models/url_shortener.py`
+
+Features:
+- Automatically generates an 8-character tracking code (`generate_tracking_code()`)
+- Stores long URLs in a short mapping
+- New API endpoint:  
+  - `POST /api/shorten` → returns short URL  
+  - `GET /t/<short_code>` → redirects to order details  
+
+This demonstrates:
+- System design thinking  
+- Small-scale distributed service design  
+- Real-world feature relevant to logistics & shipment tracking  
+
+### 4. **Professional UI Upgrade**
+`templates/index.html` now includes:
+- Responsive layout  
+- “My Orders” section  
+- Order-details modal  
+- Clean button components  
+- Share button  
+- Clear stock visualization  
 
 ## Key Enhancements & Features (V2.0)
 
@@ -36,6 +79,18 @@ A modern, responsive frontend interface built with Vanilla JavaScript and CSS3.
 ---
 
 ## Technical Architecture
+otani_system/
+├── models/
+│ ├── flower.py
+│ ├── customer.py
+│ ├── order.py
+│ └── url_shortener.py ← NEW
+│
+├── templates/
+│ └── index.html ← ENHANCED UI
+│
+├── app.py ← NEW APIs + short link support
+└── README.md
 
 ### Backend
 * **Framework:** Python (Flask)
@@ -58,6 +113,32 @@ A modern, responsive frontend interface built with Vanilla JavaScript and CSS3.
 4.  **Backend Processing:** The server validates availability, moves stock to "Committed" status, and returns a confirmation.
 
 ---
+##  Backend Enhancements
+
+### **Order Class Upgrade**
+Added:
+- `generate_tracking_code()`
+- Stores `tracking_link`
+- Returns tracking link in `POST /orders` response
+
+### **New URL Shortener Service**
+Inside `url_shortener.py`:
+- Acts like a small microservice  
+- Uses in-memory storage (can be replaced with Redis/Postgres)  
+
+This shows:
+- modularization  
+- clean system boundaries  
+- ability to design auxiliary services  
+
+##  Frontend (Updated)
+The UI now includes:
+- Order history  
+- Order detail viewer  
+- Shareable tracking link  
+- Clean product display  
+
+All interactions use JavaScript Fetch API to communicate with Flask backend.
 
 ## Setup & Installation
 
@@ -78,10 +159,13 @@ A modern, responsive frontend interface built with Vanilla JavaScript and CSS3.
 
 ---
 
-## 🔮 Future Roadmap
-* **Persistence:** Integration with PostgreSQL for long-term historical data analysis.
-* **Logistics Dashboard:** An Admin View to visualize the ratio of Available vs. Committed stock for shipping planning.
-* **Containerization:** Docker support for cloud-native deployment.
+##  Future Roadmap
+##  Future Improvements
+- Move storage to PostgreSQL  
+- Add authentication  
+- Add role-based access (farmer → exporter → importer)  
+- Add dashboards for shipment tracking  
+- Docker support for cloud-native deployment.
 
 ---
-*Developed by Sowmya Businayani*
+***Developed by Sowmya Businayani***
