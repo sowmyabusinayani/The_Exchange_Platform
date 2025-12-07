@@ -4,11 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>The Exchange Platform</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500&display=swap"
-        rel="stylesheet">
     <style>
-        /* --- RESET & BASICS --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -298,6 +294,277 @@
             transform: scale(1.02);
             background-color: #1b4332;
         }
+
+        /* My Orders Section */
+
+        #my-orders {
+            background-color: #fff;
+            padding: 100px 20px;
+            min-height: 80vh;
+        }
+
+        #my-orders h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #2d6a4f;
+        }
+
+        .orders-table {
+            width: 100%;
+            max-width: 1200px;
+            border-collapse: collapse;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .orders-table th {
+            background-color: #2d6a4f;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .orders-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .order-flower {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .order-flower img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .view-details-btn,
+        .share-btn {
+            padding: 8px 16px;
+            background-color: #2d6a4f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .view-details-btn:hover,
+        .share-btn:hover {
+            background-color: #1b4332;
+        }
+
+        .share-btn {
+            background-color: #52b788;
+            margin-left: 5px;
+        }
+
+        .share-btn:hover {
+            background-color: #40916c;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-confirmed {
+            background-color: #d8f3dc;
+            color: #2d6a4f;
+        }
+
+        .status-failed {
+            background-color: #ffe5e5;
+            color: #c92a2a;
+        }
+
+        /* Order Details Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .order-detail-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .order-detail-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: #2d6a4f;
+            margin-bottom: 10px;
+        }
+
+        .order-detail-header .order-id {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .detail-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .detail-section h4 {
+            color: #2d6a4f;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .flower-detail {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .flower-detail img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .share-section {
+            background: linear-gradient(135deg, #2d6a4f 0%, #52b788 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+        }
+
+        .share-section h4 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .share-link-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .share-link-input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .copy-link-btn {
+            padding: 12px 25px;
+            background-color: white;
+            color: #2d6a4f;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .copy-link-btn:hover {
+            background-color: #d8f3dc;
+        }
+
+        .copy-link-btn.copied {
+            background-color: #52b788;
+            color: white;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state img {
+            width: 200px;
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: #999;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #bbb;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -310,6 +577,7 @@
             <a href="#home">Home</a>
             <a href="#shop">Shop</a>
             <a href="#cart">Order Now</a>
+            <a href="#my-orders">My Orders</a>
         </div>
     </nav>
 
@@ -348,6 +616,116 @@
         <div class="cart-footer">
             <button class="checkout-btn" id="checkoutBtn">Check Out</button>
         </div>
+
+        <section id="my-orders">
+            <h2>My Orders</h2>
+            <!--<button onclick="testLoadOrders()" style="padding: 10px 20px; margin-bottom: 20px;">
+                🔄 Reload Orders
+            </button>-->
+            <!-- Orders Table -->
+            <table class="orders-table" id="ordersTable" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #2d6a4f; color: white;">
+                        <th>Order ID</th>
+                        <th>Flower</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px;">
+                            Loading orders...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Empty State (shown when no orders) -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <h3>No Orders Yet</h3>
+                <p>Your order history will appear here once you make a purchase.</p>
+            </div><br>
+            <button class="checkout-btn" onclick="document.getElementById('shop').scrollIntoView()" style=" display: flex;
+            justify-content: flex-end">
+                Start Shopping
+            </button>
+            </div>
+        </section>
+        <!-- Order Details Modal -->
+        <div class="modal-overlay" id="orderModal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeOrderModal()">&times;</span>
+
+                <div class="order-detail-header">
+                    <h3>Order Details</h3>
+                    <div class="order-id" id="modalOrderId">Order #10492</div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="detail-section">
+                    <h4>Customer Information</h4>
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value" id="modalCustomerName">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value" id="modalCustomerEmail">-</span>
+                    </div>
+                </div>
+
+                <!-- Flower Info -->
+                <div class="detail-section">
+                    <h4>Flower Details</h4>
+                    <div class="flower-detail">
+                        <img id="modalFlowerImage" src="" alt="">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 5px;" id="modalFlowerName">-
+                            </div>
+                            <div style="color: #666;">Price: ₹<span id="modalFlowerPrice">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="detail-section">
+                    <h4>Order Summary</h4>
+                    <div class="detail-row">
+                        <span class="detail-label">Quantity:</span>
+                        <span class="detail-value" id="modalQuantity">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Price:</span>
+                        <span class="detail-value">₹<span id="modalTotalPrice">0</span></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value" id="modalStatus">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Order Date:</span>
+                        <span class="detail-value" id="modalOrderDate">-</span>
+                    </div>
+                </div>
+
+                <!-- Share Section -->
+                <div class="share-section">
+                    <h4>Share Order Tracking</h4>
+                    <p style="font-size: 14px; margin-bottom: 10px; opacity: 0.9;">
+                        Send this link to the recipient to track the order
+                    </p>
+                    <div class="share-link-box">
+                        <input type="text" class="share-link-input" id="shareLinkInput" readonly>
+                        <button class="copy-link-btn" onclick="copyShareLink()">Copy Link</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
 
     <script>
@@ -359,6 +737,8 @@
         document.addEventListener("DOMContentLoaded", () => {
             fetchFlowers(); // Calls Python Backend
             document.getElementById("checkoutBtn").addEventListener("click", processCheckout);
+            setTimeout(loadMyOrders(), 1000);
+            //loadMyOrders();
         });
 
         // --- 3. FETCH DATA FROM PYTHON BACKEND ---
@@ -477,10 +857,19 @@
                 const data = await res.json();
 
                 if (res.ok) {
-                    alert(`✅ Order Success!\n\n${data.message}`);
+                    //const data = await res.json();
+                    let message = '✅ Order Success!\n\n';
+                    data.results.forEach(result => {
+                        if (result.status === 'Confirmed') {
+                            message += `${result.flower} - ₹${result.total_price}\n`;
+                            message += `📤 Share: ${result.share_link}\n\n`;
+                        }
+                    });
+                    alert(message);
                     cart = []; // Clear cart
                     renderCart();
                     fetchFlowers(); // Refresh shop to show reduced stock!
+                    loadMyOrders(); //Refreh orders list
                 } else {
                     alert(`❌ Order Failed: ${data.error || "Unknown error"}`);
                 }
@@ -489,6 +878,136 @@
                 alert("Server error during checkout.");
             }
         }
+
+        // Close modal when clicking outside
+        document.getElementById('orderModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeOrderModal();
+            }
+        });
+
+        // Fetch and display user's orders
+        async function loadMyOrders() {
+            try {
+                const res = await fetch("/my-orders");
+                const data = await res.json();
+
+                const tbody = document.getElementById('ordersTableBody');
+                const emptyState = document.getElementById('emptyState');
+                const ordersTable = document.getElementById('ordersTable');
+
+                if (data.orders.length === 0) {
+                    // Show empty state
+                    ordersTable.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                // Show table, hide empty state
+                ordersTable.style.display = 'table';
+                emptyState.style.display = 'none';
+
+                // Populate table
+                tbody.innerHTML = data.orders.map(order => `
+                    <tr>
+                        <td>#${order.order_id}</td>
+                        <td class="order-flower">
+                            <img src="${order.flower_image}" alt="${order.flower_name}">
+                            <span>${order.flower_name}</span>
+                        </td>
+                        <td>${order.quantity}</td>
+                        <td>₹${order.total_price}</td>
+                        <td>
+                            <span class="status-badge status-${order.status.toLowerCase()}">
+                                ${order.status}
+                            </span>
+                        </td>
+                        <td>${order.date}</td>
+                        <td>
+                            <button class="view-details-btn" onclick="viewOrderDetails(${order.order_id})">
+                                View Details
+                            </button>
+                            <button class="share-btn" onclick="quickShare('${order.share_link}')">
+                                Share
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error("Error loading orders:", error);
+            }
+        }
+
+        // View detailed order information
+        async function viewOrderDetails(orderId) {
+            try {
+                const res = await fetch(`/orders/details/${orderId}`);
+                const order = await res.json();
+
+                if (!res.ok) {
+                    alert("Order not found!");
+                    return;
+                }
+
+                // Populate modal with order details
+                document.getElementById('modalOrderId').textContent = `Order #${order.order_id}`;
+                document.getElementById('modalCustomerName').textContent = order.customer.name;
+                document.getElementById('modalCustomerEmail').textContent = order.customer.email;
+                document.getElementById('modalFlowerName').textContent = order.flower.name;
+                document.getElementById('modalFlowerPrice').textContent = order.flower.price;
+                document.getElementById('modalFlowerImage').src = order.flower.image_url;
+                document.getElementById('modalQuantity').textContent = order.quantity;
+                document.getElementById('modalTotalPrice').textContent = order.total_price;
+                document.getElementById('modalStatus').textContent = order.status;
+                document.getElementById('modalOrderDate').textContent = order.order_date;
+                document.getElementById('shareLinkInput').value = order.tracking.share_link;
+
+                // Show modal
+                document.getElementById('orderModal').classList.add('active');
+
+            } catch (error) {
+                console.error("Error fetching order details:", error);
+                alert("Failed to load order details");
+            }
+        }
+
+        // Close modal
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.remove('active');
+        }
+
+        // Copy share link to clipboard
+        function copyShareLink() {
+            const input = document.getElementById('shareLinkInput');
+            input.select();
+            document.execCommand('copy');
+
+            // Visual feedback
+            const btn = document.querySelector('.copy-link-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            btn.classList.add('copied');
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+
+        // Quick share (copy link directly from table)
+        function quickShare(shareLink) {
+            // Create temporary input
+            const temp = document.createElement('input');
+            temp.value = shareLink;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+
+            alert(`📋 Link copied!\n\n${shareLink}\n\nYou can now share this link via WhatsApp, Email, or SMS.`);
+        }
+
     </script>
 </body>
 

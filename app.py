@@ -1,7 +1,8 @@
-from flask import jsonify, Flask, request, render_template
+from flask import jsonify, Flask, request, render_template, redirect
 from models.flower import Flower
 from models.customer import Customer
 from models.order import Order
+from models.url_shortner import URLShortener
 
 app = Flask(__name__)
 
@@ -24,6 +25,9 @@ customers = [
 ]
 
 orders = []  # Simple list to store Order objects in memory
+
+url_shortener = URLShortener()
+
 next_order_id = 1
 
 
@@ -48,13 +52,14 @@ def get_customers():
 
 @app.route('/orders', methods=['GET'])
 def get_orders():
-    # Returns order history for the Admin Dashboard
+    #  Returns basic order list.
     data = [ord.to_dict() for ord in orders]
     return jsonify(data)
 
 
 @app.route("/orders", methods=['POST'])
 def create_order():
+    global next_order_id
     data = request.json
     # Validation: Ensure data is a list
     if not isinstance(data, list):
@@ -70,8 +75,9 @@ def create_order():
         flower = next((f for f in flowers if f.flower_id == f_id), None)
 
         if not flower:
-            results.append({"id": f_id, "status": "Failed",
-                           "reason": "Flower not found"})
+            results.append({"id": f_id,
+                            "status": "Failed",
+                            "reason": "Flower not found"})
             continue
 
         # 2. Create the Order Object
@@ -83,10 +89,22 @@ def create_order():
 
         if success:
             orders.append(order)
+            # Creating a tracking link
+            tracking_url = f"{request.host_url}orders/details/{order.order_id}"
+
+            # Generate short URL for sharing
+            short_code = url_shortener.shorten(
+                tracking_url, purpose="order_tracking")
+            short_url = f"{request.host_url}t/{short_code}"
+
             results.append({
+                "order_id": order.order_id,
                 "flower": flower.name,
+                "quantity": qty,
                 "status": "Confirmed",
-                "total_price": order.total_price
+                "total_price": order.total_price,
+                "tracking_url": tracking_url,
+                "share_link": short_url
             })
         else:
             results.append({
@@ -96,7 +114,192 @@ def create_order():
             })
     return jsonify({"message": "Batch processed", "results": results})
 
+    # NEW: Get All Orders (For "My Orders" page)
 
- # Runs the Flask server only when this file is executed directly
+
+@app.route('/my-orders', methods=['GET'])
+def get_my_orders():
+    if not orders:
+        return jsonify({
+            "orders": [],
+            "message": "No orders placed yet"
+        }), 200
+    order_list = []
+    for order in orders:
+        tracking_url = f"{request.host_url}orders/details/{order.order_id}"
+        short_code = url_shortener.shorten(
+            tracking_url, purpose="order_tracking")
+        short_url = f"{request.host_url}t/{short_code}"
+        order_list.append({
+            "order_id": order.order_id,
+            "flower_name": order.flower.name,
+            "flower_image": order.flower.image_url,
+            "quantity": order.quantity,
+            "total_price": order.total_price,
+            "status": order.status,
+            "date": order.timestamp.strftime("%b %d, %Y %H:%M"),
+            "tracking_url": tracking_url,
+            "share_link": short_url
+        })
+    return jsonify({
+        "orders": order_list,
+        "count": len(order_list)
+    }), 200
+
+    # Get Order Details (For detailed tracking page)
+
+
+@app.route('/orders/details/<int:order_id>', methods=['GET'])
+def get_order_details(order_id):
+    """
+    Returns detailed information for a specific order.
+
+        This page is accessible via:
+        1. Direct URL: /orders/details/10492
+        2. Short URL: /t/aB3xK9 (redirects here)
+         - Complete order information
+         - Customer details
+         - Flower details with image
+         - Shareable short link
+    """
+    order = next((o for o in orders if o.order_id == order_id), None)
+    if not order:
+        return jsonify({
+            "error": "Order not found",
+            "message": f"No order exists with ID {order_id}"
+        }), 404
+     # Generate shareable link
+    tracking_url = f"{request.host_url}orders/details/{order.order_id}"
+    short_code = url_shortener.shorten(
+        tracking_url, purpose="order_tracking")
+    short_url = f"{request.host_url}t/{short_code}"
+    # Return complete order details
+    return jsonify({
+        "order_id": order.order_id,
+        "status": order.status,
+        "order_date": order.timestamp.strftime("%B %d, %Y at %H:%M"),
+        "customer": {
+            "id": order.customer.customer_id,
+            "name": order.customer.name,
+            "email": order.customer.email
+        },
+        "flower": {
+            "name": order.flower.name,
+            "price": order.flower.price,
+            "image_url": order.flower.image_url,
+            "available_stock": order.flower.available_stock,
+            "committed_stock": order.flower.committed_stock
+        },
+        "quantity": order.quantity,
+        "total_price": order.total_price,
+        "tracking": {
+            "full_url": tracking_url,
+            "share_link": short_url,
+            "short_code": short_code
+        }
+    }), 200
+
+
+@app.route('/api/shorten', methods=['POST'])
+def shorten_url():
+    """
+     API endpoint to shorten a URL.
+     System generates short, shareable link
+    """
+    try:
+        data = request.json
+        # Validate input
+        if not data or 'url' not in data:
+            return jsonify({
+
+                'success': False,
+                'error': 'Missing required field: url'
+            }), 400
+
+        original_url = data['url']
+        purpose = data.get('purpose', 'general')
+
+        # Generate short code
+        short_code = url_shortener.shorten(original_url, purpose)
+
+        # Build full short URL
+        # Use request.host_url to get the base URL (http://localhost:5000/)
+        short_url = f"{request.host_url}t/{short_code}"
+
+        return jsonify({
+
+            'success': True,
+            'original_url': original_url,
+            'short_code': short_code,
+            'short_url': short_url,
+            'purpose': purpose
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/t/<short_code>')
+def redirect_short_url(short_code):
+    """
+    Redirect endpoint for shortened URLs.
+    This endpoint looks up the original URL
+    Browser redirects to original URL
+
+    Example:
+    GET /t/aB3xK9  →  Redirects to: /orders/details?order_id=10492
+    """
+    # Look up the original URL
+    original_url = url_shortener.expand(short_code)
+
+    if original_url:
+        # Redirect to the original URL
+        # Status code 302 = temporary redirect (standard for URL shorteners)
+        return redirect(original_url, code=302)
+    else:
+        # Short code not found
+        return jsonify({
+            'error': 'Link not found',
+            'message': 'This shortened link does not exist or has expired.'
+        }), 404
+
+
+@app.route('/api/link-stats/<short_code>')
+def get_link_stats(short_code):
+    """
+    Get analytics for a shortened URL.
+    """
+    stats = url_shortener.get_stats(short_code)
+    if stats:
+        return jsonify({
+            'short_code': short_code,
+            'original_url': stats['url'],
+            'purpose': stats['purpose'],
+            'click_count': stats['click_count'],
+            'created_at': stats['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+        }), 200
+    else:
+        return jsonify({
+            'error': 'Link not found'
+        }), 404
+
+
+"""@app.route('/test-shortener')
+def test_shortener():
+    test_url = "http://localhost:5000/flowers"
+    short_code = url_shortener.shorten(test_url, "test")
+    expanded = url_shortener.expand(short_code)
+
+    return jsonify({
+        'original': test_url,
+        'short_code': short_code,
+        'expanded': expanded,
+        'match': expanded == test_url
+    })
+"""
+
+# Runs the Flask server only when this file is executed directly
 if __name__ == "__main__":
     app.run(debug=True)
